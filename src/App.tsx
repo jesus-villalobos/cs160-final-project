@@ -1,11 +1,11 @@
 import React from "react";
-import { Button } from "antd";
+import "./App.css";
+
+import ChatPage from "./pages/ChatPage";
 
 const App: React.FC = () => (
-    <div className="App">
-        <Button type="primary" onClick={() => console.log("hello")}>
-            Button
-        </Button>
+    <div className="AppLayoutContainer">
+        <ChatPage pageBody={<></>} />
     </div>
 );
 
