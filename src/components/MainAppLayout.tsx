@@ -42,7 +42,7 @@ const MainAppFormat: React.FC<Props> = (props: Props) => {
                     theme="dark"
                     mode="horizontal"
                     className="AppLayoutMenuItems"
-                    defaultSelectedKeys={["2"]}
+                    defaultSelectedKeys={["home"]}
                     items={items}
                 />
             </Header>

@@ -1,20 +1,25 @@
 import React from "react";
 import "./../App.css";
-import { Button, Flex } from "antd";
+import { Flex, Typography } from "antd";
 
-import MainAppFormat from "./../components/MainAppLayout";
+import LoginPageModal from "../components/LoginPageModal";
+
+const { Title } = Typography;
 
 const LoginPage: React.FC = () => {
     return (
-        <div>
-            <MainAppFormat
-                pageBody={
-                    <Flex gap="small" wrap="wrap">
-                        <Button type="primary">Login</Button>
-                        <Button type="primary">Sign Up</Button>
-                    </Flex>
-                }
-            />
+        <div className="LoginPageBody">
+            <Title level={1} className="LoginPageTitle">
+                Welcome to GPT-Wrapped
+            </Title>
+            <Title level={2} className="LoginPageTitle">
+                Please login or sign up to continue
+            </Title>
+
+            <Flex gap="small" wrap="wrap" className="LoginPageButtons">
+                <LoginPageModal type="login" />
+                <LoginPageModal type="signup" />
+            </Flex>
         </div>
     );
 };

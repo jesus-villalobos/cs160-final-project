@@ -1,3 +1,6 @@
+/*  */
+/* GLOBALS */
+/*  */
 :root {
     --primary-color: blue;
     --secondary-color: #dedcdc;
@@ -5,6 +8,9 @@
     --border-radius: 8;
 }
 
+/*  */
+/* APP LAYOUT STYLES */
+/*  */
 .AppLayoutContainer {
     text-align: left;
 }
@@ -45,4 +51,26 @@
 .AppLayoutFooter {
     text-align: center;
     background-color: var(--secondary-color);
+}
+
+/*  */
+/* LOGIN PAGE STYLES */
+/*  */
+.LoginPageBody {
+    margin-top: 25vh;
+    display: block;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.LoginPageTitle {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.LoginPageButtons {
+    display: flex;
+    justify-content: center;
+    margin-top: 48px;
 }
