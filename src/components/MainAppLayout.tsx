@@ -1,9 +1,10 @@
 import React from "react";
 import "./../App.css";
 
-import { Layout, Menu, theme } from "antd";
+import { Layout, Menu, theme, Typography } from "antd";
 
 const { Header, Content, Footer } = Layout;
+const { Title } = Typography;
 
 const items = [
     {
@@ -26,6 +27,7 @@ const items = [
 
 type Props = {
     pageBody: any;
+    pageTitle: string;
 };
 
 const MainAppFormat: React.FC<Props> = (props: Props) => {
@@ -46,7 +48,9 @@ const MainAppFormat: React.FC<Props> = (props: Props) => {
                     items={items}
                 />
             </Header>
+
             <Content className="AppLayoutContent">
+                <Title level={2}>{props.pageTitle}</Title>
                 <div className="AppLayoutContentDiv">{props.pageBody}</div>
             </Content>
             <Footer className="AppLayoutFooter">

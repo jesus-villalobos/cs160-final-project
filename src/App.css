@@ -5,7 +5,9 @@
     --primary-color: blue;
     --secondary-color: #dedcdc;
     --background-color: #ffffff;
-    --border-radius: 8;
+    --border-radius: 16;
+    --chat-message-system: #aaa4a4;
+    --chat-message-user: #9bdbf5;
 }
 
 /*  */
@@ -80,8 +82,28 @@
 /*  */
 .ChatPageBody {
     position: relative;
-    /* display: flex; */
-    /* flex-direction: column; */
+    display: block;
     height: 75vh;
     background-color: var(--background-color);
+    border-radius: var(--border-radius);
+}
+
+.ChatMessageSYSTEM {
+    color: #000000;
+    float: left;
+    max-width: 60%;
+    background-color: var(--chat-message-system);
+    border-radius: var(--border-radius);
+    margin: 0;
+    padding: 0;
+}
+
+.ChatMessageUSER {
+    color: #000000;
+    float: right;
+    max-width: 60%;
+    background-color: var(--chat-message-user);
+    border-radius: var(--border-radius);
+    margin: 0;
+    padding: 0;
 }
