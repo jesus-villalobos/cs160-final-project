@@ -16,6 +16,7 @@ const columns: TableProps<DataType>["columns"] = [
         dataIndex: "surveyName",
         key: "surveyName",
         render: (_, record) => <a>{record.surveyTitle}</a>,
+        width: 300,
     },
     {
         title: "# of Questions",
@@ -26,13 +27,16 @@ const columns: TableProps<DataType>["columns"] = [
         title: "Description",
         dataIndex: "surveyDescription",
         key: "surveyDescription",
+        width: 600,
     },
     {
         title: "Action",
         key: "action",
         render: (_, record) => (
             <Space size="middle">
-                <a>View Survey: {record.surveyTitle}</a>
+                <a>View</a>
+                <br />
+                <a>Edit</a>
                 <br />
                 <a>Export Data</a>
             </Space>
@@ -44,32 +48,32 @@ const data: DataType[] = [
     {
         surveyTitle: "Some Cool Survey",
         surveyLength: 32,
-        surveyDescription: "New York No. 1 Lake Park",
+        surveyDescription: "I promise it's really cool. You'll be asked about trees.",
     },
     {
         surveyTitle: "Another Survey I Created",
         surveyLength: 42,
-        surveyDescription: "London No. 1 Lake Park",
+        surveyDescription: "I don't like this one. It's about rocks.",
     },
     {
         surveyTitle: "This is One More Survey",
-        surveyLength: 32,
-        surveyDescription: "Sydney No. 1 Lake Park",
+        surveyLength: 37,
+        surveyDescription: "I made this one too. I ask you about colors and shapes and other things.",
     },
     {
-        surveyTitle: "Some Cool Survey",
-        surveyLength: 32,
-        surveyDescription: "New York No. 1 Lake Park",
+        surveyTitle: "Another Cool Survey",
+        surveyLength: 22,
+        surveyDescription: "I made a couple of these.",
     },
     {
-        surveyTitle: "Another Survey I Created",
-        surveyLength: 42,
-        surveyDescription: "London No. 1 Lake Park",
+        surveyTitle: "The Best Survey",
+        surveyLength: 19,
+        surveyDescription: "It's about ducks.",
     },
     {
-        surveyTitle: "This is One More Survey",
-        surveyLength: 32,
-        surveyDescription: "Sydney No. 1 Lake Park",
+        surveyTitle: "Survey 6",
+        surveyLength: 25,
+        surveyDescription: "I'm running out of ideas.",
     },
 ];
 
