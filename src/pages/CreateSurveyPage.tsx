@@ -135,11 +135,12 @@ const CreateSurveyPage: React.FC = () => {
                     )}
                 </Form.Item> */}
                 </Form>
-            </div>
-            <div className="SurveyPageSubmitButton">
-                <Button type="primary" onClick={submitSurvey}>
-                    Submit
-                </Button>
+
+                <div className="SurveyPageSubmitButton">
+                    <Button type="primary" onClick={submitSurvey}>
+                        Submit
+                    </Button>
+                </div>
             </div>
         </div>
     );
