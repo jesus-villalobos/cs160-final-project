@@ -1,7 +1,8 @@
 import React from "react";
 import "./../App.css";
+import { useNavigate } from "react-router-dom";
 
-import { Layout, Menu, theme, Typography } from "antd";
+import { Layout, Menu, Typography } from "antd";
 
 const { Header, Content, Footer } = Layout;
 const { Title } = Typography;
@@ -13,29 +14,21 @@ const items = [
     },
     {
         label: "Create New Survey",
-        key: "create",
+        key: "create-survey",
     },
     {
         label: "View Surveys",
         key: "view-surveys",
     },
-    {
-        label: "View Feedback",
-        key: "view-feedback",
-    },
 ];
 
-type Props = {
+export interface Props {
     pageBody: any;
     pageTitle: string;
-};
+}
 
 const MainAppFormat: React.FC<Props> = (props: Props) => {
-    const {
-        token: { colorBgContainer, borderRadiusLG },
-    } = theme.useToken();
-
-    console.log(colorBgContainer, borderRadiusLG);
+    const navigate = useNavigate();
 
     return (
         <Layout className="AppLayoutBody">
@@ -46,6 +39,9 @@ const MainAppFormat: React.FC<Props> = (props: Props) => {
                     className="AppLayoutMenuItems"
                     defaultSelectedKeys={["home"]}
                     items={items}
+                    onClick={(item) => {
+                        navigate("/" + item.key);
+                    }}
                 />
             </Header>
 
