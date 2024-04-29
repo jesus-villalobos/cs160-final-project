@@ -81,7 +81,8 @@
 /* CHAT PAGE STYLES */
 /*  */
 .ChatPageBody {
-    height: 75vh;
+    /* Messing w/ height value... */
+    height: 54vh;
     background-color: var(--background-color);
     border-radius: var(--border-radius);
 }
@@ -103,6 +104,7 @@
     max-width: 60%;
     margin: 4px 0px;
     background-color: var(--chat-message-system);
+    border-radius: 10px;
 }
 
 .ChatMessageUSER {
@@ -111,12 +113,18 @@
     max-width: 60%;
     margin: 4px 0px;
     background-color: var(--chat-message-user);
+    border-radius: 10px;
 }
 
 .ChatMessageTextArea {
     padding: 8px 16px;
     border-radius: var(--border-radius);
     resize: none;
+}
+
+.NormalSurveyArea {
+    max-height: 52vh;
+    overflow-y: auto;
 }
 
 /* */
