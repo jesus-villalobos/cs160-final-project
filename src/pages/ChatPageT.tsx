@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./../App.css";
 import { Input, Space, Button, Collapse, Form, Checkbox, Radio, Row, notification } from "antd";
-import MainAppFormat from "./../components/MainAppLayout";
+import TakerFormat from "../components/Taker";
 
 
 const { Panel } = Collapse;
@@ -85,7 +85,7 @@ function convoToText(conversation: any[]) {
 }
 
 
-const ChatPage: React.FC = () => {
+const ChatPageT: React.FC = () => {
     const [input, setInput] = useState("");
     const [chatMessages, setChatMessages] = useState(currentConvo); // Used to update convo so far
     const [surveyAnswers, setSurveyAnswers] = useState({});
@@ -194,7 +194,7 @@ const ChatPage: React.FC = () => {
 
 
     return (
-        <MainAppFormat pageTitle={surveyTitle} pageBody={
+        <TakerFormat pageTitle={surveyTitle} pageBody={
             <>
             <Collapse accordion size="large">
 
@@ -318,4 +318,4 @@ const ChatPage: React.FC = () => {
     
 };
 
-export default ChatPage;
+export default ChatPageT;

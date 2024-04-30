@@ -23,7 +23,7 @@ const LoginPageLoginForm: React.FC = () => {
 
     const onClick = () => {
         setTimeout(() => {
-            navigate("/chat");
+            navigate("/choice");
         }, 2000);
     };
 
