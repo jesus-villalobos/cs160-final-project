@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { atom } from "jotai";
+import { atom, useAtom } from "jotai";
 import { Input, Space, Button } from "antd";
 
 import "./../App.css";
+import { addNewSurveyResults, ChatMessage, SurvAiChat } from "../state/store";
 import MainAppFormat from "./../components/MainAppLayout";
 
 const sampleChatMessages = [
@@ -28,35 +29,28 @@ function convoToText(conversation: any[]) {
     return convo_str;
 }
 
-// surveyChatAtom will be used to maintain the survey chat data
-interface ChatMessage {
-    messageContents: string;
-    sender: string;
-}
-
-interface SurvAiChat {
-    chatMessages: ChatMessage[];
-}
-
+// --------------------- Begin Chat State ---------------------
 const surveyChatAtom = atom<SurvAiChat>({
-    chatMessages: sampleChatMessages, // TODO: Change to empty array
+    chatMessages: sampleChatMessages as ChatMessage[],
 });
 
-const getChatMessages = atom((get) => get(surveyChatAtom).chatMessages);
-
-const addNewChatMessage = atom(
+const chatMessageFunctions = atom(
+    (get: any): ChatMessage[] => get(surveyChatAtom).chatMessages,
     (get: any, set: any, newMessage: ChatMessage): void => {
         const chatState = get(surveyChatAtom);
+        console.log("Adding new message to chat state", chatState.chatMessages);
         set(surveyChatAtom, {
             chatMessages: [...chatState.chatMessages, newMessage],
         });
     }
 );
+// --------------------- End Chat State ---------------------
 
 const ChatPage: React.FC = () => {
     const [input, setInput] = useState("");
     // Used to update convo so far
-    const [chatMessages, setChatMessages] = useState(sampleChatMessages);
+    const [getMessages, addNewChatMessage] = useAtom(chatMessageFunctions);
+    const [, pushNewSurveyResults] = useAtom(addNewSurveyResults);
 
     async function handleSubmit() {
         // Adding user's submitted chat msg
@@ -64,7 +58,8 @@ const ChatPage: React.FC = () => {
             messageContents: input,
             sender: "USER",
         };
-        setChatMessages([...chatMessages, newUserMessage]);
+
+        addNewChatMessage(newUserMessage as ChatMessage);
         setInput(""); // Clear input after submitting
 
         console.log(input);
@@ -95,7 +90,7 @@ const ChatPage: React.FC = () => {
             sender: "SYSTEM",
         };
 
-        setChatMessages([...sampleChatMessages, newSystemMessage]);
+        addNewChatMessage(newSystemMessage as ChatMessage);
         // Clear input box after submitting
         setInput("");
         sampleChatMessages.push(newSystemMessage);
@@ -113,7 +108,7 @@ const ChatPage: React.FC = () => {
             pageBody={
                 <div className="ChatPageBody">
                     <div className="ChatPageMessagesSection">
-                        {chatMessages.map((message, index) => (
+                        {getMessages.map((message, index) => (
                             <div
                                 key={index}
                                 className={`ChatMessage${message.sender}`}

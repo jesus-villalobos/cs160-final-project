@@ -1,4 +1,3 @@
-import React from "react";
 import { createStore, atom } from "jotai";
 import { atomWithStorage } from "jotai/utils";
 
@@ -6,30 +5,71 @@ import { atomWithStorage } from "jotai/utils";
 //  it will make use of localStorage to persist the state
 // More modular atoms will be used by the pages to maintain their own state,
 //  and these atoms will be combined in the appStore
-const appStore = createStore();
+export const appStore = createStore();
 
 /***********************
  *** BEGIN USER STATE **
  ***********************/
 
-interface SurvAiUser {
+export interface SurvAiUser {
     username: string;
     password: string;
+    remember: boolean;
+    completedSurveys: SurvAiSurveyResults[];
+    surveysToTake: SurvAiSurveyConfig[]; // List of survey IDs
+    curveysCreated: SurvAiSurveyConfig[]; // List of survey IDs
 }
 
 interface AllSurvAiUsers {
     users: Record<string, SurvAiUser>;
 }
 
-const userAtom = atomWithStorage<AllSurvAiUsers>("userAtom", {
-    users: {},
+// some sort of "authentication" to maintain the current user
+const currentUserAtom = atom<SurvAiUser | null>(null);
+appStore.sub(currentUserAtom, () => {
+    console.log("Current user changed to", appStore.get(currentUserAtom));
 });
 
-// userAtom will be used to maintain the user's username, password, etc
-export const getUserInfoFromStore = atom(
+export const getCurrentUserInStore = atom((get) => get(currentUserAtom));
+
+export const setCurrentUserInStore = atom(
     null,
     (get: any, set: any, newUser: SurvAiUser) => {
-        const allUsers: AllSurvAiUsers = appStore.get(userAtom);
+        appStore.set(currentUserAtom, newUser);
+    }
+);
+
+export const logoutCurrentUser = atom(null, (get: any, set: any) => {
+    appStore.set(currentUserAtom, null);
+});
+
+export const validateUserExists = atom(
+    null,
+    (get: any, set: any, newUser: SurvAiUser) => {
+        const allUsers: AllSurvAiUsers = appStore.get(allUsersAtom);
+        if (allUsers.users[newUser.username]) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+);
+
+// some "database" to maintain all users
+const allUsersAtom = atomWithStorage<AllSurvAiUsers>("allUsersAtom", {
+    users: {},
+});
+appStore.sub(allUsersAtom, () => {
+    console.log("All users changed to", appStore.get(allUsersAtom));
+});
+
+export const getAllUsersFromStore = atom((get) => {
+    return appStore.get(allUsersAtom).users;
+});
+
+export const getUserInfoFromStore = atom(
+    (get: any, set: any, newUser: SurvAiUser) => {
+        const allUsers: AllSurvAiUsers = appStore.get(allUsersAtom);
         if (allUsers.users[newUser.username]) {
             return allUsers.users[newUser.username];
         } else {
@@ -42,10 +82,10 @@ export const getUserInfoFromStore = atom(
 
 export const addNewUserToStore = atom(
     null,
-    (get: any, set: any, newUser: any) => {
-        const allUsers = appStore.get(userAtom);
+    (get: any, set: any, newUser: SurvAiUser) => {
+        const allUsers = appStore.get(allUsersAtom);
         if (!allUsers.users[newUser.username]) {
-            appStore.set(userAtom, {
+            appStore.set(allUsersAtom, {
                 users: { ...allUsers.users, [newUser.username]: newUser },
             });
         } else {
@@ -63,7 +103,7 @@ export const addNewUserToStore = atom(
  *** BEGIN SURVEY CREATION STATE **
  **********************************/
 
-interface SurveyConfig {
+export interface SurvAiSurveyConfig {
     id: string;
     title: string;
     description: string;
@@ -71,12 +111,15 @@ interface SurveyConfig {
 }
 
 interface AllSurveyConfigs {
-    surveys: Record<string, SurveyConfig>;
+    surveys: Record<string, SurvAiSurveyConfig>;
 }
 
 // surveyConfigAtom will be used to maintain the survey creation form data
 const surveyConfigAtom = atomWithStorage("surveyConfigAtom", {
     surveys: {},
+});
+appStore.sub(surveyConfigAtom, () => {
+    console.log("Survey config changed to", appStore.get(surveyConfigAtom));
 });
 
 export const getExistingSurveyConfigs = atom(
@@ -95,7 +138,8 @@ export const getSurveyConfigById = atom((get: any, surveyId: any) => {
 });
 
 export const createNewSurveyConfig = atom(
-    (get: any, set: any, newSurvey: any) => {
+    null,
+    (_get: any, _set: any, newSurvey: SurvAiSurveyConfig) => {
         const allSurveys: AllSurveyConfigs = appStore.get(surveyConfigAtom);
         if (!allSurveys.surveys[newSurvey.id]) {
             appStore.set(surveyConfigAtom, {
@@ -112,7 +156,8 @@ export const createNewSurveyConfig = atom(
 );
 
 export const deleteExistingSurveyConfig = atom(
-    (get: any, set: any, surveyId: any) => {
+    null,
+    (get: any, set: any, surveyId: string) => {
         const allSurveys: AllSurveyConfigs = appStore.get(surveyConfigAtom);
         if (allSurveys.surveys[surveyId]) {
             delete allSurveys.surveys[surveyId];
@@ -125,7 +170,8 @@ export const deleteExistingSurveyConfig = atom(
 );
 
 export const updateExistingSurveyConfig = atom(
-    (get: any, set: any, updatedSurvey: any) => {
+    null,
+    (get: any, set: any, updatedSurvey: SurvAiSurveyConfig) => {
         const allSurveys: AllSurveyConfigs = appStore.get(surveyConfigAtom);
         if (allSurveys.surveys[updatedSurvey.id]) {
             allSurveys.surveys[updatedSurvey.id] = updatedSurvey;
@@ -147,30 +193,46 @@ export const updateExistingSurveyConfig = atom(
  *** BEGIN SURVEY RESULTS STATE **
  *********************************/
 
-interface SurveyResults {
-    id: string;
-    responses: Record<string, string>;
+export interface ChatMessage {
+    messageContents: string;
+    sender: string;
 }
 
-interface AllSurveyResults {
-    results: Record<string, SurveyResults>;
+export interface SurvAiChat {
+    chatMessages: ChatMessage[];
+}
+
+export interface SurvAiSurveyResults {
+    id: string;
+    userTaker: string;
+    responses: Record<string, SurvAiChat>;
+}
+
+export interface AllSurveyResults {
+    allSurveys: Record<string, SurvAiSurveyResults>;
 }
 
 // surveyResultsAtom will be used to maintain the survey results
 const userSurveyResultsAtom = atomWithStorage("userSurveyResultsAtom", {
-    results: {},
+    allSurveys: {},
+});
+appStore.sub(userSurveyResultsAtom, () => {
+    console.log(
+        "Survey results changed to",
+        appStore.get(userSurveyResultsAtom)
+    );
 });
 
 export const getAllSurveyResults = atom(
-    (get) => appStore.get(userSurveyResultsAtom).results
+    (get) => appStore.get(userSurveyResultsAtom).allSurveys
 );
 
-export const getSurveyResultsById = atom((get: any, surveyId: any) => {
+export const getSurveyResultsById = atom((get: any, surveyId: string) => {
     const allSurveyResults: AllSurveyResults = appStore.get(
         userSurveyResultsAtom
     );
-    if (allSurveyResults.results[surveyId]) {
-        return allSurveyResults.results[surveyId];
+    if (allSurveyResults.allSurveys[surveyId]) {
+        return allSurveyResults.allSurveys[surveyId];
     } else {
         // throw new Error("Survey does not exist");
         console.log(`Survey ${surveyId} does not exist`);
@@ -179,14 +241,18 @@ export const getSurveyResultsById = atom((get: any, surveyId: any) => {
 });
 
 export const addNewSurveyResults = atom(
-    (get: any, set: any, newResults: any) => {
+    null,
+    (get: any, set: any, newResults: SurvAiSurveyResults) => {
+        const currentUser = appStore.get(currentUserAtom);
+        currentUser?.completedSurveys.push(newResults);
+
         const allSurveyResults: AllSurveyResults = appStore.get(
             userSurveyResultsAtom
         );
-        if (!allSurveyResults.results[newResults.id]) {
+        if (!allSurveyResults.allSurveys[newResults.id]) {
             appStore.set(userSurveyResultsAtom, {
-                results: {
-                    ...allSurveyResults.results,
+                allSurveys: {
+                    ...allSurveyResults.allSurveys,
                     [newResults.id]: newResults,
                 },
             });
@@ -197,18 +263,22 @@ export const addNewSurveyResults = atom(
     }
 );
 
-export const deleteSurveyResults = atom((get: any, set: any, surveyId: any) => {
-    const allSurveyResults: AllSurveyResults = appStore.get(
-        userSurveyResultsAtom
-    );
-    if (allSurveyResults.results[surveyId]) {
-        delete allSurveyResults.results[surveyId];
-        appStore.set(userSurveyResultsAtom, allSurveyResults); // Updated code
-    } else {
-        // throw new Error("Survey results do not exist");
-        console.log(`Survey results ${surveyId} do not exist`);
+export const deleteSurveyResults = atom(
+    null,
+    (get: any, set: any, surveyId: string) => {
+        const currentUser = appStore.get(currentUserAtom);
+        const allSurveyResults: AllSurveyResults = appStore.get(
+            userSurveyResultsAtom
+        );
+        if (allSurveyResults.allSurveys[surveyId]) {
+            delete allSurveyResults.allSurveys[surveyId];
+            appStore.set(userSurveyResultsAtom, allSurveyResults); // Updated code
+        } else {
+            // throw new Error("Survey results do not exist");
+            console.log(`Survey results ${surveyId} do not exist`);
+        }
     }
-});
+);
 
 /*********************************
  *** END SURVEY RESULTS STATE **
