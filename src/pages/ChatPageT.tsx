@@ -74,6 +74,7 @@ function convoToText(conversation: any[]) {
 async function exportConversation() {
     const transcript = convoToText(convo);  // Assuming form holds conversation data
     const surveyMetadata = JSON.stringify(question_metadata) // Process metadata differently
+    
 
     try {
 // import fetch from 'node-fetch'; // for node.js
@@ -96,7 +97,13 @@ async function exportConversation() {
         console.log('Received data:', response); // You can handle this data however you need to
 
         // parse response as json
-        const data = JSON.parse(response);
+        const response_data = JSON.parse(response);
+        
+        // attach transcript to the data
+        const data = {
+            "response":response_data,
+            "convo":transcript
+        };
 
         // download the data to a file titled "response.json"
         const element = document.createElement("a");
