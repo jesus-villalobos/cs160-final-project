@@ -6,15 +6,7 @@ import TakerFormat from "../components/Taker";
 
 const { Panel } = Collapse;
 
-const surveyTitle = "Insert Survey Title Here";
-
-const currentConvo = [
-    {
-        messageContents:
-            "Do you like pineapple on pizza?",
-        sender: "SYSTEM",
-    },
-];
+const surveyTitle = "Pizza Preferences";
 
 // Typical survey questions in the form of array of JS objects for sake of EXAMPLE
 // Actcual configs of multiple choice questions should be in JSON format
@@ -24,53 +16,48 @@ type Question = {
     choices: string[];
 };
 
-const multiChoiceQs: Question[] = [
+const question_metadata: Question[] = [
     // Question 1
     {
-        question: "What is your main method of ordering pizza?",
+        question: "Where do you buy your pizza?",
         type: "multi-choice",
-        choices: ["I order delivery", "I order pickup", "I cook pizza at home", "I order dine-in"
+        choices: ["Dominoes", "Pizza Hut", "Little Caesars", "Papa John's"
         ]
     },
     // Question 2
     {
-        question: "Where do you buy your pizza?",
+        question: "How do you think their pizza tastes?",
         type: "multi-choice",
-        choices: ["Dominoes", "Pizza Hut", "Little Caesars", "Papa John's"
-        ]
+        choices: ["Delicious", "Good", "Okay", "Bad", "Disgusting"]
     },
     // Question 3
     {
-        question: "Where do you buy your pizza?",
-        type: "multi-choice",
-        choices: ["Dominoes", "Pizza Hut", "Little Caesars", "Papa John's"
-        ]
+        question: "What toppings do you usually get on your pizza?",
+        type: "multi-select",
+        choices: ["Pepperoni", "Sausage", "Mushrooms", "Green Peppers", "Onions", "Olives", "Pineapple", "Anchovies", "Extra Cheese"]
     },
+    // Question 4
     {
-        question: "Where do you buy your pizza?",
-        type: "multi-choice",
-        choices: ["Dominoes", "Pizza Hut", "Little Caesars", "Papa John's"
-        ]
-    }
-    ,
-    {
-        question: "This is a multi-select question",
-        type: "multi-select",
-        choices: ["You can choose this one", "And/or this one!", "And/or me!!!", "And/or me me me!"
-        ]
-    }
-    ,
-    {
-        question: "This is another multi-select question",
-        type: "multi-select",
-        choices: ["You can choose this one", "And/or this one!", "And/or me!!!", "And/or me me me!"
-        ]
+        question: "How could that pizza be improved?",
+        type: "open-ended",
+        choices: []
     }
 ]
 
+const currentConvo = [
+    {
+        messageContents: // ask the first quesiton
+            "Hello! I am survAI. I will be asking you a few questions to gather information for the survey. Let's get started!",
+        sender: "SYSTEM",
+    }
+];
 
 // ------------------  Reagent Setup  ------------------------
-const questions = "Do you like pineapple on pizza? Why do you dislike or like it? What toppings do you prefer on your pizza?";
+// question is a string concatenation of all questions so far
+const questions = question_metadata.map((question, index) => {
+    return `${index + 1}. ${question.question}`;
+}
+).join("\n");
 const convo = currentConvo;
 
 // Converts array of messages 
@@ -84,6 +71,46 @@ function convoToText(conversation: any[]) {
     return convo_str;
 }
 
+async function exportConversation() {
+    const transcript = convoToText(convo);  // Assuming form holds conversation data
+    const surveyMetadata = JSON.stringify(question_metadata) // Process metadata differently
+
+    try {
+// import fetch from 'node-fetch'; // for node.js
+
+        const response = await fetch(
+            'https://noggin.rea.gent/wet-orca-2216',
+            {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer rg_v1_9tesyjpo79j625yruzbfuccls84mq408u3p5_ngk',
+            },
+            body: JSON.stringify({
+                // fill variables here.
+                "survey": surveyMetadata,
+                "convo": transcript,
+            }),
+            }
+        ).then(response => response.text());
+        console.log('Received data:', response); // You can handle this data however you need to
+
+        // parse response as json
+        const data = JSON.parse(response);
+
+        // download the data to a file titled "response.json"
+        const element = document.createElement("a");
+        const file = new Blob([JSON.stringify(data)], {type: 'application/json'});
+        element.href = URL.createObjectURL(file);
+        element.download = "response.json";
+        document.body.appendChild(element); // Required for this to work in FireFox
+        element.click();
+
+
+    } catch (error) {
+        console.error('Failed to export conversation:', error);
+    }
+}
 
 const ChatPageT: React.FC = () => {
     const [input, setInput] = useState("");
@@ -133,10 +160,9 @@ const ChatPageT: React.FC = () => {
         }
     }
 
-    const updateSurveyAnswerChange = (qID: string, values: any[]) => {
-        const updatedAnswers = Array.isArray(values) ? values.join(", ") : String(values);
-        setSurveyAnswers({ ...surveyAnswers, [qID]: values});
-    };
+    const updateSurveyAnswerChange = (question: string, answer: any) => {
+        setSurveyAnswers({ ...surveyAnswers, [question]: answer });
+    }
 
     // Func handling user's submitted chat response
     async function handleSubmit() {
@@ -207,7 +233,7 @@ const ChatPageT: React.FC = () => {
                         layout="vertical"
                         form={form}
                     >
-                        {multiChoiceQs.map((question, index) => (
+                        {question_metadata.map((question, index) => (
                             <Form.Item
                                 name = {`q-${index + 1}`}
                                 label={<span style={{ fontWeight: 'bold', fontSize: '20px' }}>
@@ -252,8 +278,13 @@ const ChatPageT: React.FC = () => {
                                         ))}
                                     </Checkbox.Group>
                                 )}
+                                {/* Create open-ended questions */}
+                                {question.type === "open-ended" && (
+                                    <Input 
+                                        onChange={(e) => updateSurveyAnswerChange(`QUESTION ${index + 1}`, e.target.value)}
+                                    />
+                                )}
                             </Form.Item>
-                            
                         ))}
                     </Form>
                     </div>
@@ -261,7 +292,7 @@ const ChatPageT: React.FC = () => {
 
 
                 {/* ------------------  survAI Section  ------------------------ */}
-                <Panel header="survAI Questions" key="chatbot">
+                <Panel header="Chat" key="chatbot">
                     <div className="ChatPageBody">
                         <div className="ChatPageMessagesSection">
                             {chatMessages.map((message, index) => (
@@ -300,6 +331,17 @@ const ChatPageT: React.FC = () => {
                     <div style={{ textAlign: 'center', padding: "1px", fontSize: "24px", color:"green", fontWeight: "bold" }}>
                         <p>Thank you for your participation! We have received your input.</p>
                     </div>
+                )}
+                {!surveyCompleted && (
+                <div style={{ textAlign: 'center', padding: "15px"}}>
+                    <Button 
+                    size="large"
+                    type="primary"
+                    onClick={exportConversation}
+                    >
+                        Export Chat
+                    </Button>
+                </div>
                 )}
                 {!surveyCompleted && (
                 <div style={{ textAlign: 'center', padding: "15px"}}>
