@@ -9,7 +9,7 @@ const { Title } = Typography;
 
 const items = [
     {
-        label: "GPT-Wrapped",
+        label: "SurvAI",
         key: "home",
     },
     {
@@ -50,7 +50,7 @@ const MainAppFormat: React.FC<Props> = (props: Props) => {
                 <div className="AppLayoutContentDiv">{props.pageBody}</div>
             </Content>
             <Footer className="AppLayoutFooter">
-                GPT-Wrapped - By Alanda Nguyen, Jesus Villalobos, Peter Zheng,
+                SurvAI - By Alanda Nguyen, Jesus Villalobos, Peter Zheng,
                 Rui Li
             </Footer>
         </Layout>

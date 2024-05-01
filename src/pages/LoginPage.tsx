@@ -10,7 +10,7 @@ const LoginPage: React.FC = () => {
     return (
         <div className="LoginPageBody">
             <Title level={1} className="LoginPageTitle">
-                Welcome to GPT-Wrapped
+                Welcome to SurvAI
             </Title>
             <Title level={2} className="LoginPageTitle">
                 Please login or sign up to continue
