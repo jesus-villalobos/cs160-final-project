@@ -38,7 +38,7 @@ const LoginPageLoginForm: React.FC = () => {
             logoutUser();
             setCurrentUser(values as unknown as SurvAiUser);
             setTimeout(() => {
-                navigate("/chat");
+                navigate("/choice");
             }, 2000);
         } else {
             console.log("User does not exist ... throw some error");
