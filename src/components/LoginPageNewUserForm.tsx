@@ -41,7 +41,7 @@ const LoginPageNewUserForm: React.FC = () => {
             addNewUser(values as unknown as SurvAiUser);
             setCurrentUser(values as unknown as SurvAiUser);
             setTimeout(() => {
-                navigate("/chat");
+                navigate("/choice");
             }, 2000);
         } else {
             console.log("User already exists.");
